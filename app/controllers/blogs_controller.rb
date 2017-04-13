@@ -1,5 +1,4 @@
 class BlogsController < ApplicationController
-  before_action :set_blog, only: [:show, :edit, :update, :destroy]
 
   # GET /blogs
   # GET /blogs.json
@@ -10,7 +9,7 @@ class BlogsController < ApplicationController
   # GET /blogs/1
   # GET /blogs/1.json
   def show
-    #@blog = Blog.find(params[:id]) in set_blog (below)
+    @blog = Blog.friendly.find(params[:id])
   end
 
   # GET /blogs/new
@@ -20,7 +19,7 @@ class BlogsController < ApplicationController
 
   # GET /blogs/1/edit
   def edit
-    #@blog = Blog.find(params[:id]) in set_blog (below)
+    @blog = Blog.friendly.find(params[:id])
   end
 
   # POST /blogs
@@ -43,7 +42,7 @@ class BlogsController < ApplicationController
   # PATCH/PUT /blogs/1
   # PATCH/PUT /blogs/1.json
   def update
-    #@blog = Blog.find(params[:id]) in set_blog (below)
+    @blog = Blog.friendly.find(params[:id])
     respond_to do |format|
       if @blog.update(blog_params)
         format.html { redirect_to @blog, notice: 'Blog was successfully updated.' }
@@ -58,19 +57,26 @@ class BlogsController < ApplicationController
   # DELETE /blogs/1
   # DELETE /blogs/1.json
   def destroy
-    #@blog = Blog.find(params[:id]) in set_blog (below)
+    @blog = Blog.friendly.find(params[:id])
     @blog.destroy
     respond_to do |format|
-      format.html { redirect_to blogs_url, notice: 'Entry was deleted.' }
+      format.html { redirect_to blogs_url, notice: 'Entry was deleted' }
       format.json { head :no_content }
     end
   end
 
+  def toggle_status
+    @blog = Blog.friendly.find(params[:id])
+    if @blog.published?
+      @blog.draft!
+    elsif @blog.draft?
+      @blog.published!
+    end
+    redirect_to blogs_url, notice: 'Post status has been updated'
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_blog
-      @blog = Blog.find(params[:id])
-    end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def blog_params
