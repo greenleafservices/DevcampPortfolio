@@ -60,9 +60,19 @@ class BlogsController < ApplicationController
     @blog = Blog.friendly.find(params[:id])
     @blog.destroy
     respond_to do |format|
-      format.html { redirect_to blogs_url, notice: 'Entry was deleted.' }
+      format.html { redirect_to blogs_url, notice: 'Entry was deleted' }
       format.json { head :no_content }
     end
+  end
+
+  def toggle_status
+    @blog = Blog.friendly.find(params[:id])
+    if @blog.published?
+      @blog.draft!
+    elsif @blog.draft?
+      @blog.published!
+    end
+    redirect_to blogs_url, notice: 'Post status has been updated'
   end
 
   private
